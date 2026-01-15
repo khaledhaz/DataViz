@@ -94,7 +94,7 @@ export function DashboardView() {
             <PatientFlowchart />
 
             {/* KPI Grid */}
-            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+            <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
                 <KPICard
                     title="Total Patients / Rows"
                     value={totalPatients.toLocaleString()}
@@ -115,7 +115,7 @@ export function DashboardView() {
             </div>
 
             {/* Chart Section */}
-            <div className="grid gap-4 grid-cols-1">
+            <div className="grid gap-3 sm:gap-4 grid-cols-1">
                 <Card className="col-span-1 shadow-md border-muted">
                     <CardHeader>
                         <CardTitle className="font-heading text-xl">Distribution by {categoryCol}</CardTitle>

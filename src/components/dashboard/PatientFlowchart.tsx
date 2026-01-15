@@ -193,72 +193,168 @@ export function PatientFlowchart() {
     if (stats.total === 0) return null;
 
     return (
-        <Card className="col-span-1 lg:col-span-7 overflow-x-auto">
+        <Card className="col-span-1 lg:col-span-7 overflow-hidden">
             <CardHeader>
                 <CardTitle>Patient Triage Flow</CardTitle>
             </CardHeader>
-            <CardContent className="min-w-[1000px] flex justify-center pb-12">
-                {/* Level 1: Total */}
-                <TreeNode label="Total Patients" count={stats.total} grandTotal={stats.total} type="neutral">
-
-                    {/* Level 2: Branches (CTA, Nil, Excluded) */}
-                    <div className="flex gap-12 items-start">
-
-                        {/* 1. CTA Done */}
-                        <TreeNode label="CTA Done" count={stats.ctaYes} grandTotal={stats.total} type="default">
-                            {/* Level 3: AI */}
-                            <div className="flex gap-8">
-                                <TreeNode label="CTA + AI" count={stats.aiYes} grandTotal={stats.total} type="default">
-                                    <div className="flex flex-col gap-6 items-center">
-                                        {/* Level 4: Outcomes */}
-                                        <div className="flex gap-2">
-                                            <LeafNode label="True Pos" count={stats.tp} grandTotal={stats.total} type="success" />
-                                            <LeafNode label="True Neg" count={stats.tn} grandTotal={stats.total} type="success" />
-                                            <LeafNode label="False Pos" count={stats.fp} grandTotal={stats.total} type="error" />
-                                            <LeafNode label="False Neg" count={stats.fn} grandTotal={stats.total} type="error" />
-                                        </div>
-
-                                        {/* Additional Analysis Row */}
-                                        {(stats.itIssues > 0 || stats.noCtReport > 0 || stats.noAiReport > 0 || stats.radioWrong > 0) && (
-                                            <div className="mt-8 pt-6 border-t border-border/50 w-full flex flex-col items-center">
-                                                <span className="text-xs font-semibold text-muted-foreground mb-4 uppercase tracking-wider bg-background px-2 -mt-9">Deep Dive Analysis</span>
-                                                <div className="flex gap-4">
-                                                    <LeafNode label="IT Issues" count={stats.itIssues} grandTotal={stats.total} type="neutral" />
-                                                    <LeafNode label="No CT Report" count={stats.noCtReport} grandTotal={stats.total} type="neutral" />
-                                                    <LeafNode label="No AI Report" count={stats.noAiReport} grandTotal={stats.total} type="warning" />
-                                                    <LeafNode label="Rad Wrong" count={stats.radioWrong} grandTotal={stats.total} type="error" />
-                                                </div>
+            <CardContent className="p-0 sm:p-6">
+                {/* Desktop View (Horizontal Tree) */}
+                <div className="hidden md:flex justify-center pb-12 overflow-x-auto min-w-[1000px]">
+                    <TreeNode label="Total Patients" count={stats.total} grandTotal={stats.total} type="neutral">
+                        <div className="flex gap-12 items-start">
+                            {/* 1. CTA Done */}
+                            <TreeNode label="CTA Done" count={stats.ctaYes} grandTotal={stats.total} type="default">
+                                <div className="flex gap-8">
+                                    <TreeNode label="CTA + AI" count={stats.aiYes} grandTotal={stats.total} type="default">
+                                        <div className="flex flex-col gap-6 items-center">
+                                            <div className="flex gap-2">
+                                                <LeafNode label="True Pos" count={stats.tp} grandTotal={stats.total} type="success" />
+                                                <LeafNode label="True Neg" count={stats.tn} grandTotal={stats.total} type="success" />
+                                                <LeafNode label="False Pos" count={stats.fp} grandTotal={stats.total} type="error" />
+                                                <LeafNode label="False Neg" count={stats.fn} grandTotal={stats.total} type="error" />
                                             </div>
-                                        )}
-                                    </div>
-                                </TreeNode>
-
-                                <LeafNode label="No AI / Other" count={stats.noAi} grandTotal={stats.total} type="neutral" />
-                            </div>
-                        </TreeNode>
-
-                        {/* 2. Excluded (New Branch) */}
-                        {stats.excludedCount > 0 && (
-                            <TreeNode label="Excluded" count={stats.excludedCount} grandTotal={stats.total} type="error">
-                                <div className="flex gap-2 flex-wrap max-w-[300px] justify-center">
-                                    {stats.exclusionBreakdown.map((item, idx) => (
-                                        <LeafNode
-                                            key={idx}
-                                            label={item.label}
-                                            count={item.count}
-                                            grandTotal={stats.total}
-                                            type="error"
-                                        />
-                                    ))}
+                                            {(stats.itIssues > 0 || stats.noCtReport > 0 || stats.noAiReport > 0 || stats.radioWrong > 0) && (
+                                                <div className="mt-8 pt-6 border-t border-border/50 w-full flex flex-col items-center">
+                                                    <span className="text-xs font-semibold text-muted-foreground mb-4 uppercase tracking-wider bg-background px-2 -mt-9">Deep Dive Analysis</span>
+                                                    <div className="flex gap-4">
+                                                        <LeafNode label="IT Issues" count={stats.itIssues} grandTotal={stats.total} type="neutral" />
+                                                        <LeafNode label="No CT Report" count={stats.noCtReport} grandTotal={stats.total} type="neutral" />
+                                                        <LeafNode label="No AI Report" count={stats.noAiReport} grandTotal={stats.total} type="warning" />
+                                                        <LeafNode label="Rad Wrong" count={stats.radioWrong} grandTotal={stats.total} type="error" />
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </TreeNode>
+                                    <LeafNode label="No AI / Other" count={stats.noAi} grandTotal={stats.total} type="neutral" />
                                 </div>
                             </TreeNode>
-                        )}
 
-                        {/* 3. Nil / No CTA */}
-                        <LeafNode label="Nil / No CTA" count={stats.ctaNo} grandTotal={stats.total} type="warning" />
+                            {/* 2. Excluded */}
+                            {stats.excludedCount > 0 && (
+                                <TreeNode label="Excluded" count={stats.excludedCount} grandTotal={stats.total} type="error">
+                                    <div className="flex gap-2 flex-wrap max-w-[300px] justify-center">
+                                        {stats.exclusionBreakdown.map((item, idx) => (
+                                            <LeafNode key={idx} label={item.label} count={item.count} grandTotal={stats.total} type="error" />
+                                        ))}
+                                    </div>
+                                </TreeNode>
+                            )}
+
+                            {/* 3. Nil */}
+                            <LeafNode label="Nil / No CTA" count={stats.ctaNo} grandTotal={stats.total} type="warning" />
+                        </div>
+                    </TreeNode>
+                </div>
+
+                {/* Mobile View (Vertical Stack) */}
+                <div className="md:hidden flex flex-col gap-4 p-4">
+                    {/* Total Card */}
+                    <div className="bg-muted/30 p-4 rounded-xl border border-muted text-center">
+                        <div className="text-xs uppercase font-bold text-muted-foreground tracking-widest">Total Patients</div>
+                        <div className="text-4xl font-heading font-bold my-1">{stats.total}</div>
+                        <div className="text-xs opacity-50">100% of Dataset</div>
                     </div>
 
-                </TreeNode>
+                    {/* Exclusions Logic */}
+                    {stats.excludedCount > 0 && (
+                        <div className="border border-red-200 bg-red-50/50 rounded-xl p-4">
+                            <div className="flex justify-between items-center mb-2">
+                                <span className="font-bold text-red-900">Excluded</span>
+                                <span className="bg-red-100 text-red-700 px-2 py-0.5 rounded text-xs font-bold">{stats.excludedCount}</span>
+                            </div>
+                            <div className="space-y-2">
+                                {stats.exclusionBreakdown.slice(0, 5).map((item, i) => (
+                                    <div key={i} className="flex justify-between text-sm text-red-800/80 border-b border-red-100 last:border-0 pb-1 last:pb-0">
+                                        <span>{item.label}</span>
+                                        <span className="font-medium">{item.count}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Main Flow Stack */}
+                    <div className="space-y-3 relative pl-4 border-l-2 border-primary/20 ml-2">
+                        {/* 1. CTA Done */}
+                        <div className="bg-card border rounded-lg p-3 shadow-sm relative">
+                            <div className="absolute w-4 h-0.5 bg-primary/20 -left-[22px] top-6" />
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    <div className="font-bold text-primary">CTA Done</div>
+                                    <div className="text-sm text-muted-foreground">{((stats.ctaYes / stats.total) * 100).toFixed(1)}%</div>
+                                </div>
+                                <div className="text-2xl font-heading font-bold">{stats.ctaYes}</div>
+                            </div>
+                        </div>
+
+                        {/* Nested AI */}
+                        <div className="space-y-3 pl-4 border-l-2 border-primary/20 ml-2">
+                            <div className="bg-card border rounded-lg p-3 shadow-sm relative">
+                                <div className="absolute w-4 h-0.5 bg-primary/20 -left-[22px] top-6" />
+                                <div className="flex justify-between items-center">
+                                    <div>
+                                        <div className="font-bold text-primary">CTA + AI</div>
+                                        <div className="text-sm text-muted-foreground">{((stats.aiYes / stats.total) * 100).toFixed(1)}%</div>
+                                    </div>
+                                    <div className="text-2xl font-heading font-bold">{stats.aiYes}</div>
+                                </div>
+
+                                {/* Outcomes Grid */}
+                                <div className="grid grid-cols-2 gap-2 mt-3 pt-3 border-t">
+                                    <div className="bg-green-50/50 p-2 rounded text-center border border-green-100">
+                                        <div className="text-[10px] uppercase text-green-800 font-bold">True Pos</div>
+                                        <div className="font-heading font-bold text-green-900">{stats.tp}</div>
+                                    </div>
+                                    <div className="bg-green-50/50 p-2 rounded text-center border border-green-100">
+                                        <div className="text-[10px] uppercase text-green-800 font-bold">True Neg</div>
+                                        <div className="font-heading font-bold text-green-900">{stats.tn}</div>
+                                    </div>
+                                    <div className="bg-red-50/50 p-2 rounded text-center border border-red-100">
+                                        <div className="text-[10px] uppercase text-red-800 font-bold">False Pos</div>
+                                        <div className="font-heading font-bold text-red-900">{stats.fp}</div>
+                                    </div>
+                                    <div className="bg-red-50/50 p-2 rounded text-center border border-red-100">
+                                        <div className="text-[10px] uppercase text-red-800 font-bold">False Neg</div>
+                                        <div className="font-heading font-bold text-red-900">{stats.fn}</div>
+                                    </div>
+                                </div>
+
+                                {/* Deep Dive Mobile */}
+                                {(stats.itIssues > 0 || stats.noCtReport > 0 || stats.noAiReport > 0 || stats.radioWrong > 0) && (
+                                    <div className="mt-3 pt-3 border-t text-xs text-muted-foreground space-y-1">
+                                        <div className="font-bold uppercase tracking-wider mb-2">Deep Dive</div>
+                                        <div className="flex justify-between"><span>IT Issues</span><span>{stats.itIssues}</span></div>
+                                        <div className="flex justify-between"><span>No CT Report</span><span>{stats.noCtReport}</span></div>
+                                        <div className="flex justify-between text-yellow-600"><span>No AI Report</span><span>{stats.noAiReport}</span></div>
+                                        <div className="flex justify-between text-red-600"><span>Rad Wrong</span><span>{stats.radioWrong}</span></div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* No AI Sibling */}
+                            <div className="bg-muted/10 border border-dashed rounded-lg p-3 relative">
+                                <div className="absolute w-4 h-0.5 bg-primary/20 -left-[22px] top-6" />
+                                <div className="flex justify-between items-center opacity-70">
+                                    <div className="font-medium text-sm">No AI / Other</div>
+                                    <div className="font-bold">{stats.noAi}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Nil Sibling */}
+                    <div className="bg-yellow-50/30 border border-yellow-200/50 rounded-lg p-3 shadow-sm relative ml-2">
+                        <div className="absolute w-2 h-8 border-l-2 border-b-2 border-primary/20 -left-[10px] -top-[16px] rounded-bl-lg" />
+                        <div className="flex justify-between items-center text-yellow-900/80">
+                            <div>
+                                <div className="font-bold text-sm">Nil / No CTA</div>
+                            </div>
+                            <div className="text-xl font-heading font-bold">{stats.ctaNo}</div>
+                        </div>
+                    </div>
+
+                </div>
             </CardContent>
         </Card>
     );
