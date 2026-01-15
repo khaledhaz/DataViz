@@ -3,7 +3,7 @@ import { KPICard } from './KPICard';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useMemo, useState } from 'react';
-import { Database, TrendingUp, Users, Activity } from 'lucide-react';
+import { TrendingUp, Users, Activity } from 'lucide-react';
 import { PatientFlowchart } from './PatientFlowchart';
 import { useFilteredData } from '@/hooks/use-filtered-data';
 
@@ -19,7 +19,7 @@ export function DashboardView() {
     });
 
     // If metricCol is "Count", we just count rows. Otherwise we sum the values.
-    const [metricCol, setMetricCol] = useState<string>("Count");
+    const [metricCol] = useState<string>("Count");
 
     // Aggregation Logic for Chart
     const chartData = useMemo(() => {
