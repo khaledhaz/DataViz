@@ -3,12 +3,10 @@ import {
     getCoreRowModel,
     flexRender,
     type ColumnDef,
-    getPaginationRowModel,
 } from '@tanstack/react-table';
-import { useMemo } from 'react';
+import { useMemo, useState, useRef, useEffect } from 'react';
 import { useAppStore } from '@/store/useAppStore';
 import { useFilteredData } from '@/hooks/use-filtered-data';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export const DataTable = () => {
     const { columns } = useAppStore();
@@ -24,17 +22,40 @@ export const DataTable = () => {
         [columns]
     );
 
+    const [visibleCount, setVisibleCount] = useState(20);
+    const observerRef = useRef<HTMLDivElement | null>(null);
+
+    // Reset visible count when filters change
+    useEffect(() => {
+        setVisibleCount(20);
+    }, [data.length]);
+
     const table = useReactTable({
         data,
         columns: tableColumns,
         getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
-        initialState: {
-            pagination: {
-                pageSize: 10,
-            },
-        },
     });
+
+    const rows = table.getRowModel().rows;
+    const visibleRows = rows.slice(0, visibleCount);
+
+    // Infinite Scroll Observer
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting && visibleCount < rows.length) {
+                    setVisibleCount((prev: number) => Math.min(prev + 20, rows.length));
+                }
+            },
+            { threshold: 0.1 }
+        );
+
+        if (observerRef.current) {
+            observer.observe(observerRef.current);
+        }
+
+        return () => observer.disconnect();
+    }, [visibleCount, rows.length]);
 
     if (data.length === 0) return null;
 
@@ -60,19 +81,31 @@ export const DataTable = () => {
                             ))}
                         </thead>
                         <tbody className="[&_tr:last-child]:border-0">
-                            {table.getRowModel().rows.length ? (
-                                table.getRowModel().rows.map((row) => (
-                                    <tr
-                                        key={row.id}
-                                        className="border-b transition-colors hover:bg-muted/30 data-[state=selected]:bg-muted"
-                                    >
-                                        {row.getVisibleCells().map((cell) => (
-                                            <td key={cell.id} className="p-4 align-middle [&:has([role=checkbox])]:pr-0 whitespace-nowrap text-muted-foreground">
-                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                            {visibleRows.length ? (
+                                <>
+                                    {visibleRows.map((row) => (
+                                        <tr
+                                            key={row.id}
+                                            className="border-b transition-colors hover:bg-muted/30 data-[state=selected]:bg-muted"
+                                        >
+                                            {row.getVisibleCells().map((cell) => (
+                                                <td key={cell.id} className="p-4 align-middle [&:has([role=checkbox])]:pr-0 whitespace-nowrap text-muted-foreground">
+                                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                                </td>
+                                            ))}
+                                        </tr>
+                                    ))}
+                                    {/* Sentry div for Infinite Scroll */}
+                                    {visibleCount < rows.length && (
+                                        <tr>
+                                            <td colSpan={columns.length} className="p-4 text-center">
+                                                <div ref={observerRef} className="h-4 w-full flex justify-center items-center">
+                                                    <span className="text-xs text-muted-foreground animate-pulse">Loading more...</span>
+                                                </div>
                                             </td>
-                                        ))}
-                                    </tr>
-                                ))
+                                        </tr>
+                                    )}
+                                </>
                             ) : (
                                 <tr>
                                     <td colSpan={columns.length} className="h-32 text-center text-muted-foreground">
@@ -85,26 +118,8 @@ export const DataTable = () => {
                 </div>
             </div>
 
-            {/* Pagination Controls */}
-            <div className="flex items-center justify-end space-x-2 py-4">
-                <button
-                    className="flex items-center px-4 py-2 text-sm font-medium border rounded-md hover:bg-muted disabled:opacity-50"
-                    onClick={() => table.previousPage()}
-                    disabled={!table.getCanPreviousPage()}
-                >
-                    <ChevronLeft className="w-4 h-4 mr-1" /> Previous
-                </button>
-                <span className="text-sm">
-                    Page {table.getState().pagination.pageIndex + 1} of{' '}
-                    {table.getPageCount()}
-                </span>
-                <button
-                    className="flex items-center px-4 py-2 text-sm font-medium border rounded-md hover:bg-muted disabled:opacity-50"
-                    onClick={() => table.nextPage()}
-                    disabled={!table.getCanNextPage()}
-                >
-                    Next <ChevronRight className="w-4 h-4 ml-1" />
-                </button>
+            <div className="text-xs text-center text-muted-foreground">
+                Showing {Math.min(visibleCount, rows.length)} of {rows.length} rows
             </div>
         </div>
     );
