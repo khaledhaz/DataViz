@@ -1,7 +1,7 @@
 import { useAppStore } from '@/store/useAppStore';
 import { KPICard } from './KPICard';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { useMemo, useState } from 'react';
 import { TrendingUp, Users, Activity } from 'lucide-react';
 import { PatientFlowchart } from './PatientFlowchart';
@@ -115,12 +115,29 @@ export function DashboardView() {
             </div>
 
             {/* Chart Section */}
+            {/* Chart Section */}
             <div className="grid gap-3 sm:gap-4 grid-cols-1">
+                {/* Chart Controls - Moved outside for visibility */}
+                <div className="flex flex-col sm:flex-row justify-between items-end sm:items-center gap-4 bg-card/30 p-1 rounded-xl">
+                    <h3 className="font-heading text-lg font-bold text-foreground px-2">Distribution Analysis</h3>
+                    <div className="flex items-center gap-3 bg-card p-1.5 rounded-lg border shadow-sm">
+                        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider pl-2">Group By:</span>
+                        <select
+                            className="bg-transparent text-sm font-medium focus:outline-none cursor-pointer p-1"
+                            value={categoryCol}
+                            onChange={(e) => setCategoryCol(e.target.value)}
+                        >
+                            {columns.map((col) => (
+                                <option key={col} value={col}>
+                                    {col}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+
                 <Card className="col-span-1 shadow-md border-muted">
-                    <CardHeader>
-                        <CardTitle className="font-heading text-xl">Distribution by {categoryCol}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="pl-0 sm:pl-2">
+                    <CardContent className="pt-6">
                         <div className="h-[300px] md:h-[400px] w-full">
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={chartData} margin={{ top: 20, right: 30, left: -20, bottom: 50 }}>

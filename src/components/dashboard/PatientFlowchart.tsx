@@ -198,53 +198,55 @@ export function PatientFlowchart() {
                 <CardTitle>Patient Triage Flow</CardTitle>
             </CardHeader>
             <CardContent className="p-0 sm:p-6">
-                {/* Desktop View (Horizontal Tree) */}
-                <div className="hidden md:flex justify-center pb-12 overflow-x-auto min-w-[1000px]">
-                    <TreeNode label="Total Patients" count={stats.total} grandTotal={stats.total} type="neutral">
-                        <div className="flex gap-12 items-start">
-                            {/* 1. CTA Done */}
-                            <TreeNode label="CTA Done" count={stats.ctaYes} grandTotal={stats.total} type="default">
-                                <div className="flex gap-8">
-                                    <TreeNode label="CTA + AI" count={stats.aiYes} grandTotal={stats.total} type="default">
-                                        <div className="flex flex-col gap-6 items-center">
-                                            <div className="flex gap-2">
-                                                <LeafNode label="True Pos" count={stats.tp} grandTotal={stats.total} type="success" />
-                                                <LeafNode label="True Neg" count={stats.tn} grandTotal={stats.total} type="success" />
-                                                <LeafNode label="False Pos" count={stats.fp} grandTotal={stats.total} type="error" />
-                                                <LeafNode label="False Neg" count={stats.fn} grandTotal={stats.total} type="error" />
-                                            </div>
-                                            {(stats.itIssues > 0 || stats.noCtReport > 0 || stats.noAiReport > 0 || stats.radioWrong > 0) && (
-                                                <div className="mt-8 pt-6 border-t border-border/50 w-full flex flex-col items-center">
-                                                    <span className="text-xs font-semibold text-muted-foreground mb-4 uppercase tracking-wider bg-background px-2 -mt-9">Deep Dive Analysis</span>
-                                                    <div className="flex gap-4">
-                                                        <LeafNode label="IT Issues" count={stats.itIssues} grandTotal={stats.total} type="neutral" />
-                                                        <LeafNode label="CTA Report Missing" count={stats.noCtReport} grandTotal={stats.total} type="neutral" />
-                                                        <LeafNode label="No AI Report" count={stats.noAiReport} grandTotal={stats.total} type="warning" />
-                                                        <LeafNode label="Rad Wrong" count={stats.radioWrong} grandTotal={stats.total} type="error" />
-                                                    </div>
+                {/* Desktop View (Horizontal Tree) - Improvements for Tablet Scrolling */}
+                <div className="hidden md:flex justify-center pb-8 overflow-x-auto min-w-full touch-pan-x">
+                    <div className="min-w-[1024px] px-4 pb-4">
+                        <TreeNode label="Total Patients" count={stats.total} grandTotal={stats.total} type="neutral">
+                            <div className="flex gap-12 items-start">
+                                {/* 1. CTA Done */}
+                                <TreeNode label="CTA Done" count={stats.ctaYes} grandTotal={stats.total} type="default">
+                                    <div className="flex gap-8">
+                                        <TreeNode label="CTA + AI" count={stats.aiYes} grandTotal={stats.total} type="default">
+                                            <div className="flex flex-col gap-6 items-center">
+                                                <div className="flex gap-2">
+                                                    <LeafNode label="True Pos" count={stats.tp} grandTotal={stats.total} type="success" />
+                                                    <LeafNode label="True Neg" count={stats.tn} grandTotal={stats.total} type="success" />
+                                                    <LeafNode label="False Pos" count={stats.fp} grandTotal={stats.total} type="error" />
+                                                    <LeafNode label="False Neg" count={stats.fn} grandTotal={stats.total} type="error" />
                                                 </div>
-                                            )}
-                                        </div>
-                                    </TreeNode>
-                                    <LeafNode label="No AI / Other" count={stats.noAi} grandTotal={stats.total} type="neutral" />
-                                </div>
-                            </TreeNode>
-
-                            {/* 2. Excluded */}
-                            {stats.excludedCount > 0 && (
-                                <TreeNode label="Excluded" count={stats.excludedCount} grandTotal={stats.total} type="error">
-                                    <div className="flex gap-2 flex-wrap max-w-[300px] justify-center">
-                                        {stats.exclusionBreakdown.map((item, idx) => (
-                                            <LeafNode key={idx} label={item.label} count={item.count} grandTotal={stats.total} type="error" />
-                                        ))}
+                                                {(stats.itIssues > 0 || stats.noCtReport > 0 || stats.noAiReport > 0 || stats.radioWrong > 0) && (
+                                                    <div className="mt-8 pt-6 border-t border-border/50 w-full flex flex-col items-center">
+                                                        <span className="text-xs font-semibold text-muted-foreground mb-4 uppercase tracking-wider bg-background px-2 -mt-9">Deep Dive Analysis</span>
+                                                        <div className="flex gap-4">
+                                                            <LeafNode label="IT Issues" count={stats.itIssues} grandTotal={stats.total} type="neutral" />
+                                                            <LeafNode label="CTA Report Missing" count={stats.noCtReport} grandTotal={stats.total} type="neutral" />
+                                                            <LeafNode label="No AI Report" count={stats.noAiReport} grandTotal={stats.total} type="warning" />
+                                                            <LeafNode label="Rad Wrong" count={stats.radioWrong} grandTotal={stats.total} type="error" />
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </TreeNode>
+                                        <LeafNode label="No AI / Other" count={stats.noAi} grandTotal={stats.total} type="neutral" />
                                     </div>
                                 </TreeNode>
-                            )}
 
-                            {/* 3. Nil */}
-                            <LeafNode label="No CTA Scan Found" count={stats.ctaNo} grandTotal={stats.total} type="warning" />
-                        </div>
-                    </TreeNode>
+                                {/* 2. Excluded */}
+                                {stats.excludedCount > 0 && (
+                                    <TreeNode label="Excluded" count={stats.excludedCount} grandTotal={stats.total} type="error">
+                                        <div className="flex gap-2 flex-wrap max-w-[300px] justify-center">
+                                            {stats.exclusionBreakdown.map((item, idx) => (
+                                                <LeafNode key={idx} label={item.label} count={item.count} grandTotal={stats.total} type="error" />
+                                            ))}
+                                        </div>
+                                    </TreeNode>
+                                )}
+
+                                {/* 3. Nil */}
+                                <LeafNode label="No CTA Scan Found" count={stats.ctaNo} grandTotal={stats.total} type="warning" />
+                            </div>
+                        </TreeNode>
+                    </div>
                 </div>
 
                 {/* Mobile View (Vertical Stack) */}
