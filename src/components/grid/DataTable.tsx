@@ -24,6 +24,7 @@ export const DataTable = () => {
 
     const [visibleCount, setVisibleCount] = useState(20);
     const observerRef = useRef<HTMLDivElement | null>(null);
+    const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
     // Reset visible count when filters change
     useEffect(() => {
@@ -43,11 +44,16 @@ export const DataTable = () => {
     useEffect(() => {
         const observer = new IntersectionObserver(
             (entries) => {
+                // Check intersecting OR if we have rootMargin helping us
                 if (entries[0].isIntersecting && visibleCount < rows.length) {
                     setVisibleCount((prev: number) => Math.min(prev + 20, rows.length));
                 }
             },
-            { threshold: 0.1 }
+            {
+                root: scrollContainerRef.current, // Use the scroll container as root
+                threshold: 0.1,
+                rootMargin: "200px" // Load 200px before reaching the bottom
+            }
         );
 
         if (observerRef.current) {
@@ -62,7 +68,10 @@ export const DataTable = () => {
     return (
         <div className="space-y-4">
             <div className="rounded-2xl border bg-card/50 backdrop-blur-sm shadow-sm overflow-hidden">
-                <div className="relative w-full overflow-auto max-h-[600px]">
+                <div
+                    ref={scrollContainerRef}
+                    className="relative w-full overflow-auto max-h-[600px] scroll-smooth"
+                >
                     <table className="w-full caption-bottom text-sm">
                         <thead className="[&_tr]:border-b sticky top-0 bg-card/95 backdrop-blur-md z-20 shadow-sm">
                             {table.getHeaderGroups().map((headerGroup) => (
