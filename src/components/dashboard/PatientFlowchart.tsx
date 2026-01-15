@@ -218,7 +218,7 @@ export function PatientFlowchart() {
                                                     <span className="text-xs font-semibold text-muted-foreground mb-4 uppercase tracking-wider bg-background px-2 -mt-9">Deep Dive Analysis</span>
                                                     <div className="flex gap-4">
                                                         <LeafNode label="IT Issues" count={stats.itIssues} grandTotal={stats.total} type="neutral" />
-                                                        <LeafNode label="No CT Report" count={stats.noCtReport} grandTotal={stats.total} type="neutral" />
+                                                        <LeafNode label="CTA Report Missing" count={stats.noCtReport} grandTotal={stats.total} type="neutral" />
                                                         <LeafNode label="No AI Report" count={stats.noAiReport} grandTotal={stats.total} type="warning" />
                                                         <LeafNode label="Rad Wrong" count={stats.radioWrong} grandTotal={stats.total} type="error" />
                                                     </div>
@@ -242,7 +242,7 @@ export function PatientFlowchart() {
                             )}
 
                             {/* 3. Nil */}
-                            <LeafNode label="Nil / No CTA" count={stats.ctaNo} grandTotal={stats.total} type="warning" />
+                            <LeafNode label="No CTA Scan Found" count={stats.ctaNo} grandTotal={stats.total} type="warning" />
                         </div>
                     </TreeNode>
                 </div>
@@ -325,7 +325,7 @@ export function PatientFlowchart() {
                                     <div className="mt-3 pt-3 border-t text-xs text-muted-foreground space-y-1">
                                         <div className="font-bold uppercase tracking-wider mb-2">Deep Dive</div>
                                         <div className="flex justify-between"><span>IT Issues</span><span>{stats.itIssues}</span></div>
-                                        <div className="flex justify-between"><span>No CT Report</span><span>{stats.noCtReport}</span></div>
+                                        <div className="flex justify-between"><span>CTA Report Missing</span><span>{stats.noCtReport}</span></div>
                                         <div className="flex justify-between text-yellow-600"><span>No AI Report</span><span>{stats.noAiReport}</span></div>
                                         <div className="flex justify-between text-red-600"><span>Rad Wrong</span><span>{stats.radioWrong}</span></div>
                                     </div>
@@ -348,7 +348,7 @@ export function PatientFlowchart() {
                         <div className="absolute w-2 h-8 border-l-2 border-b-2 border-primary/20 -left-[10px] -top-[16px] rounded-bl-lg" />
                         <div className="flex justify-between items-center text-yellow-900/80">
                             <div>
-                                <div className="font-bold text-sm">Nil / No CTA</div>
+                                <div className="font-bold text-sm">No CTA Scan Found</div>
                             </div>
                             <div className="text-xl font-heading font-bold">{stats.ctaNo}</div>
                         </div>
